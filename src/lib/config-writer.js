@@ -2,6 +2,7 @@ const fs = require('fs');
 const { userConfigPath, userConfigDir, userDockerConfigPath } = require('./user-config');
 const crypto = require('crypto');
 const freePort = require('find-free-port');
+const rimraf = require('rimraf');
 
 const findAFreePort = async (startAt=9000) => {
     return new Promise(resolve => {
@@ -80,4 +81,9 @@ const writeDockerConfig = (username, config) => {
     ); 
 };
 
-module.exports = { writeConfig, newConfig };
+const deleteConfig = async (username) => {
+    await new Promise(resolve => {
+        rimraf(userConfigDir(username), () => resolve());
+    });
+} ;
+module.exports = { writeConfig, newConfig, deleteConfig };

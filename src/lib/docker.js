@@ -27,6 +27,18 @@ const listContainers = async () => {
     });                         
 };
 
+const stopContainer = async (container) => {
+    return new Promise(resolve => {
+        container.stop().then(resp => resolve(resp));
+    });
+};
+
+const deleteContainer = async (container) => {
+    return new Promise(resolve => {       
+        container.delete().then(resp => resolve(resp));
+    });  
+};
+
 const startMovienight = async (username) => {
     const { movienightPort, rtmpPort } = readUserDockerConfig(username);
     const { StreamKey } = readUserConfig(username);
@@ -60,4 +72,22 @@ const startIRC = async (username) => {
     return container; 
 };
 
-module.exports = { startMovienight, startIRC };
+const stopMovienight = async (username) => {
+    const containers = await listContainers();
+    const container = containers.filter(c => (
+        c.data.Names.some(n => n === `/${username}-movienight`)
+    ))[0];
+    await stopContainer(container);
+    await deleteContainer(container);
+};
+
+const stopIRC = async (username) => { 
+    const containers = await listContainers();
+    const container = containers.filter(c => ( 
+        c.data.Names.some(n => n === `/${username}-irc`)
+    ))[0];
+    await stopContainer(container);
+    await deleteContainer(container);
+};
+
+module.exports = { startMovienight, startIRC, stopMovienight, stopIRC };

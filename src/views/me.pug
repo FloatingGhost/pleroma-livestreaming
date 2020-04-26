@@ -1,0 +1,23 @@
+html
+  head
+    title My User
+  body
+    h1= username
+  if provisioned
+    p Provisioned!
+    p Running on port
+    p= dockerConfig.movienightPort
+    p RTMP on
+    p= dockerConfig.rtmpPort
+    p IRC bridge on
+    p= dockerConfig.rtmpPort
+    p Stream key
+    p= config.StreamKey
+    p Admin Password
+    p= config.AdminPassword
+    form(method="POST" action="/deprovision")
+      button(type='submit') Delete my channel
+
+  else
+    form(method="POST" action="/provision")
+      button(type='submit') Create my channel
