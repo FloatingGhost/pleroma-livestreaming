@@ -1,0 +1,21 @@
+{
+  "name": "streaming-provisioner",
+  "version": "1.0.0",
+  "description": "Like twitch but awful",
+  "main": "index.js",
+  "author": "FloatingGhost",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "express-validator": "^6.4.0",
+    "node-docker-api": "^1.1.22",
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-google": "^0.14.0",
+    "nodemon": "^2.0.3"
+  }
+}

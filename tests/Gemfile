@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+source 'http://rubygems.org' do
+  gem 'cucumber'
+  gem 'json_spec', '~> 1.1', '>= 1.1.4'
+  gem 'process-helper'
+  gem 'pry'
+  gem 'rest-client', '~> 2.1'
+  gem 'rspec'
+  gem 'rspec-expectations'
+  gem 'docker-api'
+end

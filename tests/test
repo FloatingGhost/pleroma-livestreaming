@@ -1,0 +1,7 @@
+#!/bin/bash
+export NODE_ENV="TEST"
+cd "$( dirname "$0" )"
+mkdir -p build/test-results
+bundle config set path '.gems'
+bundle install
+exec bundle exec cucumber --color --expand --strict --format json -o build/test-results/cucumber.json --fail-fast --format pretty --tags ~@wip "$@"
