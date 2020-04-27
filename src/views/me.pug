@@ -1,8 +1,8 @@
-html
-  head
-    title My User
-  body
-    h1= session.username
+extends layout.pug
+
+block content
+  h1 Hello #{session.username}!
+
   if provisioned
     p Provisioned!
     p Your stream is located 
