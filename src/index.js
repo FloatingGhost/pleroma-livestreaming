@@ -2,12 +2,13 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 const session = require('express-session');
 const { login, authorize } = require('./lib/pleroma-authenticator');
-const { newConfig, deleteConfig } = require('./lib/config-writer');
+const { newConfig, deleteConfig, writeNginxConfig } = require('./lib/config-writer');
 const fs = require('fs');
-const { startMovienight, startIRC, stopMovienight, stopIRC } = require('./lib/docker');
+const { startMovienight, startIRC, stopMovienight, stopIRC, startNginx, reloadNginx } = require('./lib/docker');
 const { isProvisioned } = require('./lib/user');
 const { userConfigPath } = require('./lib/user-config');
 const { readUserDockerConfig, readUserConfig } = require('./lib/user-config');
+const { configPath } = require('./lib/config');
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -65,6 +66,7 @@ app.post('/provision', authorize, async (req, res) => {
     await newConfig(req.session.username);
     await startMovienight(req.session.username);
     await startIRC(req.session.username);
+    await reloadNginx();
     return res.redirect('/me');
 });
 
@@ -75,10 +77,18 @@ app.post('/deprovision', authorize, async (req, res) => {
     await stopMovienight(req.session.username);
     await stopIRC(req.session.username);
     await deleteConfig(req.session.username);
+    await reloadNginx();
     delete req.session.username;
     return res.redirect('/');
 });
 
 const port = process.env.PORT || 8000;
-fs.mkdirSync('config', { recursive: true });
+fs.mkdirSync(configPath('.'), { recursive: true });
+fs.mkdirSync(configPath('nginx'), { recursive: true });
+writeNginxConfig('provisioner', {}, { movienightPort: port });
+
+(async function() {
+    console.log(await startNginx());
+}());
+
 app.listen(port, () => console.log(`Listening on port ${port}`));

@@ -1,7 +1,8 @@
 const {Docker} = require('node-docker-api');
-const { readUserDockerConfig, readUserConfig, userConfigDir } = require('./user-config');
+const { readUserDockerConfig, userConfigDir } = require('./user-config');
 
 const docker = new Docker();
+const path = require('path');
 
 const createContainer = async (params) => {
     return new Promise(resolve => {
@@ -41,13 +42,10 @@ const deleteContainer = async (container) => {
 
 const startMovienight = async (username) => {
     const { movienightPort, rtmpPort } = readUserDockerConfig(username);
-    const { StreamKey } = readUserConfig(username);
 
-    console.log(readUserDockerConfig(username));
     const container = await createContainer({
         Image: 'floatingghost/movienight',
         name: `${username}-movienight`,
-        Cmd: ['/bin/sh', '-c', `./MovieNight -k ${StreamKey}`],
         PortBindings: {
             '8089/tcp': [{'HostPort': movienightPort.toString() }],
             '1935/tcp': [{'HostPort': rtmpPort.toString() }]
@@ -56,38 +54,74 @@ const startMovienight = async (username) => {
             `${userConfigDir(username)}:/config`
         ]
     });
-    console.log(container);
     await startContainer(container);
     return container;
 };
 
 const startIRC = async (username) => {
+    const { ircPort, movienightPort } = readUserDockerConfig(username);
     const container = await createContainer({
         Image: 'floatingghost/movie-night-chat',
         name: `${username}-irc`,
-        Cmd: ['/bin/sh', '-c', `./main --url ws://${username}-movienight:8000`],
-        Ports: ['6667']
+        Cmd: ['/bin/sh', '-c', `./main --url ws://${process.env.HOST_IP}:${movienightPort}/ws`],
+        PortBindings: {
+            '6667/tcp': [{'HostPort': ircPort.toString() }]
+        }
     });                
     await startContainer(container);
     return container; 
 };
 
-const stopMovienight = async (username) => {
+const startNginx = async () => {
+    const nginxConfigPath = path.resolve(path.join(process.env.CONFIG_PATH, 'nginx'));
+    if (await getContainerByName('nginx-router') === undefined) {
+        const container = await createContainer({
+            Image: 'floatingghost/nginx',
+            name: 'nginx-router',
+            PortBindings: { 
+                '80/tcp': [{'HostPort': '80' }],
+                '443/tcp': [{'HostPort': '443' }]
+            },
+            Binds: [
+                `${nginxConfigPath}:/etc/nginx/conf.d`
+            ]
+        });
+        await startContainer(container);
+        return container;
+    } else {
+        console.log('Already running');
+    }
+};
+
+const reloadNginx = async () => {
+    const container = await getContainerByName('nginx-router');
+    return new Promise(resolve => {
+        container.restart().then(() => resolve());
+    });
+};
+
+
+const getContainerByName = async (name) => {
     const containers = await listContainers();
-    const container = containers.filter(c => (
-        c.data.Names.some(n => n === `/${username}-movienight`)
-    ))[0];
+    return containers.filter(c => (
+        c.data.Names.some(n => n === `/${name}`)
+    ))[0];  
+};
+
+
+const stopMovienight = async (username) => {
+    const container = await getContainerByName(`${username}-movienight`);
     await stopContainer(container);
     await deleteContainer(container);
 };
 
 const stopIRC = async (username) => { 
-    const containers = await listContainers();
-    const container = containers.filter(c => ( 
-        c.data.Names.some(n => n === `/${username}-irc`)
-    ))[0];
+    const container = await getContainerByName(`${username}-irc`);
     await stopContainer(container);
     await deleteContainer(container);
 };
 
-module.exports = { startMovienight, startIRC, stopMovienight, stopIRC };
+module.exports = { 
+    startMovienight, startIRC, stopMovienight,
+    stopIRC, startNginx, reloadNginx
+};

@@ -10,7 +10,7 @@ const userDockerConfigPath = (username) => (
 );
 
 const userConfigPath = (username) => (
-    path.join(userConfigDir(username), 'config.json')
+    path.join(userConfigDir(username), 'settings.json')
 );
 
 const readUserDockerConfig = (username) => (
