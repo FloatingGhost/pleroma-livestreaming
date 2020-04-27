@@ -1,0 +1,56 @@
+server {
+    server_name    stream.myfedi;
+    access_log /var/log/nginx/stream.access.log;
+    listen         80;
+    location / {
+       return         301 https://$server_name$request_uri;
+    }
+}
+
+# Enable SSL session caching for improved performance
+ssl_session_cache shared:ssl_session_cache:10m;
+
+server {
+    listen 443 ssl http2;
+    ssl_session_timeout 5m;
+    ssl_certificate      /etc/ssl/private/my.cert;
+    ssl_certificate_key   /etc/ssl/private/my.key;
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+    # Add TLSv1.0 to support older devices
+    access_log /var/log/nginx/stream.access.log;
+
+    ssl_ciphers "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA2>
+
+
+    ssl_prefer_server_ciphers on;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    server_name stream.myfedi;
+
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_buffers 16 8k;
+    gzip_http_version 1.1;
+    gzip_types text/plain text/css application/json application/javascript text/javascript image$
+    
+
+    location / {
+        # Set this to the port you run nodejs on. It's 8000 by default
+        proxy_pass http://localhost:8000;
+    }
+
+    location /channels/ {
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_redirect off;
+
+        // Set this so your NGINX_PORT in your .env file
+        proxy_pass http://localhost:9001;
+    }
+}
+
