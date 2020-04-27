@@ -18,7 +18,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(session({
-    secret: 'test',
+    secret: process.env.SECRET_KEY,
     resave: true,
     saveUninitialized: true,
     cookie: { secure: 'auto' }
