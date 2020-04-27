@@ -2,9 +2,9 @@ const { stopMovienight, stopIRC, reloadNginx } = require('./lib/docker');
 const { deleteConfig } = require('./lib/config-writer');
 
 require('dotenv').config();
-console.log('Deprovision', process.argv[1]);
+console.log('Deprovision', process.argv[2]);
 (async function() {
-    const channel = process.argv[1];
+    const channel = process.argv[2];
     await stopMovienight(channel);
     await stopIRC(channel);
     await deleteConfig(channel);
