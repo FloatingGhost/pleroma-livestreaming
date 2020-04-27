@@ -68,7 +68,7 @@ app.post('/login', [
         req.session.username = username;
         return res.redirect('/me');
     } else {
-        return res.status(403).json({ error: 'could not authenticate' });
+        return res.status(403).render('login-fail');
     }
 });
 

@@ -17,7 +17,7 @@ const authorize = async (req, res, next) => {
     if (req.session.username) {
         next();
     } else {
-        res.status(403).json({error: 'user is not authorized'});
+        return res.status(403).render('login-fail');
     }
 };
 
