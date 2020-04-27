@@ -83,7 +83,8 @@ const startNginx = async () => {
                 '80/tcp': [{'HostPort': process.env.NGINX_PORT }],
             },
             Binds: [
-                `${nginxConfigPath}:/etc/nginx/conf.d`
+                `${path.resolve('../nginx-conf')}:/etc/nginx/conf.d`,
+                `${nginxConfigPath}:/etc/nginx/sites/`
             ]
         });
         await startContainer(container);
