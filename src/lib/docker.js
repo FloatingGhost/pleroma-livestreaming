@@ -77,7 +77,7 @@ const startNginx = async () => {
     const nginxContainer = await getContainerByName('nginx-router');
     if (nginxContainer === undefined) {
         const container = await createContainer({
-            Image: 'floatingghost/nginx',
+            Image: 'nginx',
             name: 'nginx-router',
             PortBindings: { 
                 '80/tcp': [{'HostPort': process.env.NGINX_PORT }],
