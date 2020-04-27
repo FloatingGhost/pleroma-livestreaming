@@ -3,7 +3,7 @@ Description=Livestreaming
 After=network.target
 
 [Service]
-User=hannah
+User=myuser
 WorkingDirectory=/home/myuser/pleroma-livestreaming/src
 ExecStart=/usr/bin/node index.js
 ExecReload=/bin/kill $MAINPID
