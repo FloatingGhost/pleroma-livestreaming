@@ -22,7 +22,7 @@ const startContainer = async (container) => {
 
 const listContainers = async () => {
     return new Promise(resolve => {
-        docker.container.list().then( 
+        docker.container.list({ all: 1 }).then( 
             response => resolve(response)
         );                      
     });                         
@@ -74,13 +74,13 @@ const startIRC = async (username) => {
 
 const startNginx = async () => {
     const nginxConfigPath = path.resolve(path.join(process.env.CONFIG_PATH, 'nginx'));
-    if (await getContainerByName('nginx-router') === undefined) {
+    const nginxContainer = await getContainerByName('nginx-router');
+    if (nginxContainer === undefined) {
         const container = await createContainer({
             Image: 'floatingghost/nginx',
             name: 'nginx-router',
             PortBindings: { 
-                '80/tcp': [{'HostPort': '80' }],
-                '443/tcp': [{'HostPort': '443' }]
+                '80/tcp': [{'HostPort': process.env.NGINX_PORT }],
             },
             Binds: [
                 `${nginxConfigPath}:/etc/nginx/conf.d`
@@ -89,14 +89,16 @@ const startNginx = async () => {
         await startContainer(container);
         return container;
     } else {
-        console.log('Already running');
+        nginxContainer.start();
     }
 };
 
 const reloadNginx = async () => {
     const container = await getContainerByName('nginx-router');
     return new Promise(resolve => {
-        container.restart().then(() => resolve());
+        container.exec.create({
+            Cmd: ['nginx', '-s', 'reload']
+        }).then(exec => exec.start()).then(() => resolve());
     });
 };
 

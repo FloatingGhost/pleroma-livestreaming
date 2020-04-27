@@ -2,13 +2,17 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 const session = require('express-session');
 const { login, authorize } = require('./lib/pleroma-authenticator');
-const { newConfig, deleteConfig, writeNginxConfig } = require('./lib/config-writer');
+const { newConfig, deleteConfig } = require('./lib/config-writer');
 const fs = require('fs');
 const { startMovienight, startIRC, stopMovienight, stopIRC, startNginx, reloadNginx } = require('./lib/docker');
 const { isProvisioned } = require('./lib/user');
 const { userConfigPath } = require('./lib/user-config');
 const { readUserDockerConfig, readUserConfig } = require('./lib/user-config');
 const { configPath } = require('./lib/config');
+const path = require('path');
+const fetch = require('node-fetch');
+
+require('dotenv').config();
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -23,7 +27,7 @@ app.set('view engine', 'pug');
 app.set('views', './views');
 
 app.get('/', async (req, res) => {
-    res.render('index', { title: 'Hey', message: 'Hello there!' });
+    res.render('index', { session: req.session, instanceUrl: process.env.INSTANCE_URL });
 });
 
 app.get('/me', authorize, async (req, res) => {
@@ -33,7 +37,19 @@ app.get('/me', authorize, async (req, res) => {
         config = readUserConfig(req.session.username);
         dockerConfig = readUserDockerConfig(req.session.username);
     } 
-    res.render('me', { session: req.session, provisioned: isProvisioned(req.session.username), dockerConfig, config });
+    res.render('me', { session: req.session, provisioned: isProvisioned(req.session.username), dockerConfig, config, env: process.env });
+});
+
+app.get('/list', async (req, res) => {
+    const live = await Promise.all(fs.readdirSync(path.resolve(process.env.CONFIG_PATH), { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name)
+        .filter(x => x !== 'nginx')
+        .map(async channel => {
+            const resp = await fetch(`http://127.0.0.1:${process.env.NGINX_PORT}/channels/${channel}/live`, { method: 'HEAD' });
+            return [channel, resp.status == 200];
+        }));
+    res.render('channels', { channels: live });
 });
 
 app.post('/login', [
@@ -85,7 +101,6 @@ app.post('/deprovision', authorize, async (req, res) => {
 const port = process.env.PORT || 8000;
 fs.mkdirSync(configPath('.'), { recursive: true });
 fs.mkdirSync(configPath('nginx'), { recursive: true });
-writeNginxConfig('provisioner', {}, { movienightPort: port });
 
 (async function() {
     console.log(await startNginx());

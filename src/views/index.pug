@@ -1,12 +1,15 @@
-html
-  head
-    title= title
-  body
-    h1= message
-    form(method="POST" action="/login")
-        label Username: 
-        input(type='text', name='username')
-        label Password:
-        input(type='password', name='password')
-        button(type='submit') Log In
-    
+extends layout.pug
+
+block content
+  h1 Pleroma Streaming
+  if session.username
+      h3 hello #{session.username}
+  else
+      h3 Log in to your #{instanceUrl} account
+      form(method="POST" action="/login")
+          label Username: 
+          input(type='text', name='username')
+          label Password:
+          input(type='password', name='password')
+          button(type='submit') Log In
+        

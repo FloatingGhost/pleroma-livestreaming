@@ -49,7 +49,7 @@ const newConfig = async (username) => {
         SessionKey: randomString(32)
     };
 
-    const portBase = Math.floor(9000 + (Math.random() * 2000));
+    const portBase = Math.floor(10000 + (Math.random() * 10000));
     const ircPort = await findAFreePort(portBase);
     const movienightPort = await findAFreePort(ircPort + 1);
     const rtmpPort = await findAFreePort(movienightPort + 1);
@@ -93,6 +93,7 @@ const writeNginxConfig = (username, config, { movienightPort }) => {
         .replace(/\$SSL_CERT/g, process.env.SSL_CERT)
         .replace(/\$SSL_KEY/g, process.env.SSL_KEY)
         .replace(/\$PORT/g, movienightPort)
+        .replace(/\$NGINX_PORT/g, process.env.NGINX_PORT)
         .replace(/\$HOST_IP/g, process.env.HOST_IP);
         
     fs.writeFileSync(nginxConfigPath, conf);

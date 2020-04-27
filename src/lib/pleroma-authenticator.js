@@ -8,7 +8,7 @@ const login = async (user, pass) => {
     const queryString = querystring.stringify({
         user, pass
     });
-    const resp = await fetch(`https://ihatebeinga.live/check_password?${queryString}`);
+    const resp = await fetch(`${process.env.INSTANCE_URL}/check_password?${queryString}`);
     const json = await resp.json();
     return json;
 };

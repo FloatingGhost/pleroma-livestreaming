@@ -2,19 +2,21 @@ html
   head
     title My User
   body
-    h1= username
+    h1= session.username
   if provisioned
     p Provisioned!
-    p Running on port
-    p= dockerConfig.movienightPort
-    p RTMP on
-    p= dockerConfig.rtmpPort
-    p IRC bridge on
-    p= dockerConfig.ircPort
-    p Stream key
-    p= config.StreamKey
+    p Your stream is located 
+        a(href=`/channels/${session.username}`) here
+    h2 Streaming Instructions
+    p Please point OBS at rtmp://#{env.HOST_IP}:#{dockerConfig.rtmpPort}/live
+    p And set your stream key to
+    pre= config.StreamKey
+    p Your IRC bridge is located at
+    p irc.ihatebeinga.live port #{dockerConfig.ircPort}
+
     p Admin Password
     p= config.AdminPassword
+
     form(method="POST" action="/deprovision")
       button(type='submit') Delete my channel
 
