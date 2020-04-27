@@ -12,7 +12,7 @@ html
     p And set your stream key to
     pre= config.StreamKey
     p Your IRC bridge is located at
-    p irc.ihatebeinga.live port #{dockerConfig.ircPort}
+    p #{env.IRC_DOMAIN} port #{dockerConfig.ircPort}
 
     p Admin Password
     p= config.AdminPassword
