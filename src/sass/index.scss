@@ -1,0 +1,42 @@
+html {
+    font-family: Lato;
+}
+
+a.channel {
+    text-decoration: none;
+    font-size: 200%;
+}
+
+.content {
+    padding-top: 10%;
+
+    form {
+        label {
+            padding: 1em 1em 1em 1em;
+        }
+    }
+}
+
+.navbar {
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    li {
+        float: left;
+    }
+
+    a {
+        display: block;
+        padding: 8px;
+        background-color: #dddddd;
+        color: #000000;
+        text-decoration: none;
+
+        &:hover {
+            color: #ffffff;
+        }
+    }
+}

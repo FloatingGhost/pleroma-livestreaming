@@ -1,4 +1,5 @@
-const { startMovienight, stopMovienight } = require('./lib/docker');
+const { stopMovienight } = require('./lib/docker');
+const { deleteConfig } = require('./lib/config-writer');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
@@ -10,6 +11,6 @@ require('dotenv').config();
         .filter(x => x !== 'nginx')
         .map(async channel => {    
             await stopMovienight(channel);
-            await startMovienight(channel);
+            await deleteConfig(channel);
         }));
 })();

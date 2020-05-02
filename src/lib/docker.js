@@ -58,20 +58,6 @@ const startMovienight = async (username) => {
     return container;
 };
 
-const startIRC = async (username) => {
-    const { ircPort, movienightPort } = readUserDockerConfig(username);
-    const container = await createContainer({
-        Image: 'floatingghost/movie-night-chat',
-        name: `${username}-irc`,
-        Cmd: ['/bin/sh', '-c', `./main --url ws://${process.env.HOST_IP}:${movienightPort}/ws`],
-        PortBindings: {
-            '6667/tcp': [{'HostPort': ircPort.toString() }]
-        }
-    });                
-    await startContainer(container);
-    return container; 
-};
-
 const startNginx = async () => {
     const nginxConfigPath = path.resolve(path.join(process.env.CONFIG_PATH, 'nginx'));
     const nginxContainer = await getContainerByName('nginx-router');
@@ -118,13 +104,7 @@ const stopMovienight = async (username) => {
     await deleteContainer(container);
 };
 
-const stopIRC = async (username) => { 
-    const container = await getContainerByName(`${username}-irc`);
-    await stopContainer(container);
-    await deleteContainer(container);
-};
-
 module.exports = { 
-    startMovienight, startIRC, stopMovienight,
-    stopIRC, startNginx, reloadNginx
+    startMovienight, stopMovienight,
+    startNginx, reloadNginx
 };

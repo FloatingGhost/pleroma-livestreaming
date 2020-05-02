@@ -1,12 +1,19 @@
 html
   head
     title Pleroma Streaming- #{title}
+    link(rel='stylesheet' href='public/index.css')
   body
-    h1 
-        a(href='/') Pleroma Streaming
-    h3
-        a(href='/list') Channel list
-    h3
-        a(href='/me') My Channel
-    block content
+    div.navbar
+        ul
+            li
+                h3
+                    a(href='/') Pleroma Streaming
+            li 
+                h3
+                    a(href='/list') Channel list
+            li
+                h3
+                    a(href='/me') My Channel
+    div.content
+        block content
         

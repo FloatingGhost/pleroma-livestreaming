@@ -3,7 +3,7 @@ extends layout.pug
 block content
     each channel in channels
         p
-            a(href=`/channels/${channel[0]}`) #{channel[0]}
+            a.channel(href=`/channels/${channel[0]}`) #{channel[0]}
             if channel[1]
                 p LIVE!
        

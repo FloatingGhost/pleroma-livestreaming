@@ -4,13 +4,14 @@ const session = require('express-session');
 const { login, authorize } = require('./lib/pleroma-authenticator');
 const { newConfig, deleteConfig } = require('./lib/config-writer');
 const fs = require('fs');
-const { startMovienight, startIRC, stopMovienight, stopIRC, startNginx, reloadNginx } = require('./lib/docker');
+const { startMovienight, stopMovienight, startNginx, reloadNginx } = require('./lib/docker');
 const { isProvisioned } = require('./lib/user');
 const { userConfigPath } = require('./lib/user-config');
 const { readUserDockerConfig, readUserConfig } = require('./lib/user-config');
 const { configPath } = require('./lib/config');
 const path = require('path');
 const fetch = require('node-fetch');
+const sassMiddleware = require('node-sass-middleware');
 
 require('dotenv').config();
 
@@ -24,8 +25,17 @@ app.use(session({
     cookie: { secure: 'auto' }
 }));
 app.set('view engine', 'pug');
-app.set('views', './views');
+app.set('views', path.resolve(__dirname, './views'));
 
+app.use(
+    sassMiddleware({
+        src: path.join(__dirname, 'sass'),
+        dest: path.join(__dirname, 'public'), 
+        debug: true,
+        prefix: '/public'
+    })
+);
+app.use('/public', express.static(path.join(__dirname, 'public')));
 app.get('/', async (req, res) => {
     res.render('index', { session: req.session, instanceUrl: process.env.INSTANCE_URL });
 });
@@ -81,7 +91,6 @@ app.post('/provision', authorize, async (req, res) => {
 
     await newConfig(req.session.username);
     await startMovienight(req.session.username);
-    await startIRC(req.session.username);
     await reloadNginx();
     return res.redirect('/me');
 });
@@ -91,7 +100,6 @@ app.post('/deprovision', authorize, async (req, res) => {
         return res.status(400).json({ error: 'not provisioned' });
     }
     await stopMovienight(req.session.username);
-    await stopIRC(req.session.username);
     await deleteConfig(req.session.username);
     await reloadNginx();
     delete req.session.username;
@@ -100,10 +108,10 @@ app.post('/deprovision', authorize, async (req, res) => {
 
 const port = process.env.PORT || 8000;
 fs.mkdirSync(configPath('.'), { recursive: true });
-fs.mkdirSync(configPath('nginx'), { recursive: true });
+fs.mkdirSync(path.resolve(path.join(process.env.CONFIG_PATH, '/nginx')), { recursive: true });
 
 (async function() {
-    console.log(await startNginx());
+    await startNginx();
 }());
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

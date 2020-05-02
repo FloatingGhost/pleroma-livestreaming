@@ -1,15 +1,18 @@
 extends layout.pug
 
 block content
-  h1 Pleroma Streaming
   if session.username
       h3 hello #{session.username}
   else
       h3 Log in to your #{instanceUrl} account
       form(method="POST" action="/login")
-          label Username: 
+          label(for='username') Username: 
           input(type='text', name='username')
-          label Password:
+          br
+          br
+          label(for='password') Password:
           input(type='password', name='password')
+          br 
+          br
           button(type='submit') Log In
         

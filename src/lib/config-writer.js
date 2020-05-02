@@ -85,7 +85,15 @@ const writeDockerConfig = (username, config) => {
 };
 
 const writeNginxConfig = (username, config, { movienightPort }) => {
-    const baseConfig = fs.readFileSync('./nginx-template.conf').toString();
+    const baseConfig = fs.readFileSync(
+        path.resolve(
+            path.join(
+                __dirname,
+                '../nginx-template.conf'
+            )
+        )
+    ).toString();
+
     const nginxConfigPath = path.resolve(path.join(process.env.CONFIG_PATH, 'nginx', `${username}.conf`));
     const conf = baseConfig
         .replace(/\$CHANNEL/g, username)

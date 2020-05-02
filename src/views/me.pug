@@ -11,8 +11,7 @@ block content
     p Please point OBS at rtmp://#{env.HOST_IP}:#{dockerConfig.rtmpPort}/live
     p And set your stream key to
     pre= config.StreamKey
-    p Your IRC bridge is located at
-    p #{env.IRC_DOMAIN} port #{dockerConfig.ircPort}
+    p Your IRC bridge is located on ##{session.username} at #{env.IRC_DOMAIN}
 
     p Admin Password
     p= config.AdminPassword
