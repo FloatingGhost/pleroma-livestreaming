@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { userConfigPath, userConfigDir, userDockerConfigPath } = require('./user-config');
+const { userConfigPath, userConfigDir, userDockerConfigPath, readUserConfig } = require('./user-config');
 const crypto = require('crypto');
 const freePort = require('find-free-port');
 const rimraf = require('rimraf');
@@ -50,16 +50,15 @@ const newConfig = async (username) => {
     };
 
     const portBase = Math.floor(10000 + (Math.random() * 10000));
-    const ircPort = await findAFreePort(portBase);
-    const movienightPort = await findAFreePort(ircPort + 1);
+    const movienightPort = await findAFreePort(portBase);
     const rtmpPort = await findAFreePort(movienightPort + 1);
     
     const dockerConfig = {
-        ircPort, movienightPort, rtmpPort
+        movienightPort, rtmpPort
     };
        
     createUserConfigDir(username); 
-    writeConfig(username, config);
+    writeUserConfig(username, config);
     writeDockerConfig(username, dockerConfig);
     writeNginxConfig(username, config, dockerConfig);
 };
@@ -69,7 +68,7 @@ const createUserConfigDir = (username) => {
     fs.mkdirSync(path, { recursive: true });
 };
      
-const writeConfig = (username, config) => {
+const writeUserConfig = (username, config) => {
     fs.writeFileSync(
         userConfigPath(username),
         JSON.stringify(config)
@@ -114,4 +113,23 @@ const deleteConfig = async (username) => {
     });
     fs.unlinkSync(nginxConfigPath);
 } ;
-module.exports = { writeConfig, newConfig, deleteConfig, writeNginxConfig };
+
+const alterUserConfig = (username, patch) => {
+    writeUserConfig(username, {
+        ...readUserConfig(username),
+        ...patch
+    });
+};
+
+const resetPassword = (username) => {
+    alterUserConfig(username, { AdminPassword: randomString(16) });
+};
+
+const resetStreamKey = (username) => {
+    alterUserConfig(username, { StreamKey: randomString(16) });
+};
+
+module.exports = {
+    writeUserConfig, newConfig, deleteConfig, writeNginxConfig, randomString,
+    alterUserConfig, resetStreamKey, resetPassword
+};

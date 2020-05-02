@@ -36,7 +36,7 @@ Feature: Movienight provisioner
         And that the user "test" has logged in
         And that the "StreamKey" for channel "test" is set to "somekey"
         When a "POST" request is made to "/streamkey"
-        Then the response should be 200
+        Then the response should be 302
         And the "StreamKey" for channel "test" should not be "somekey"
 
     Scenario: Reset admin password
@@ -46,7 +46,7 @@ Feature: Movienight provisioner
         And that the user "test" has logged in
         And that the "AdminPassword" for channel "test" is set to "somepass"
         When a "POST" request is made to "/password"        
-        Then the response should be 200
+        Then the response should be 302
         And the "AdminPassword" for channel "test" should not be "somepass"
 
     Scenario: List channels

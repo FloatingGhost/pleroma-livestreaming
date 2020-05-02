@@ -2,7 +2,7 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 const session = require('express-session');
 const { login, authorize } = require('./lib/pleroma-authenticator');
-const { newConfig, deleteConfig } = require('./lib/config-writer');
+const { newConfig, deleteConfig, resetPassword, resetStreamKey } = require('./lib/config-writer');
 const fs = require('fs');
 const { startMovienight, stopMovienight, startNginx, reloadNginx } = require('./lib/docker');
 const { isProvisioned } = require('./lib/user');
@@ -71,10 +71,8 @@ app.post('/login', [
         return res.status(400).json({ errors: errors.array() });
     }
     const { username, password } = req.body;
-    console.log(`Authentication request from ${username}`);
     const resp = await login(username, password);
     if (resp) {
-        console.log('Login successful');
         req.session.username = username;
         return res.redirect('/me');
     } else {
@@ -105,6 +103,27 @@ app.post('/deprovision', authorize, async (req, res) => {
     delete req.session.username;
     return res.redirect('/');
 });
+
+app.post('/streamkey', authorize, async (req, res) => {
+    if (!isProvisioned(req.session.username)) {
+        return res.status(400).json({ error: 'not provisioned' });
+    } 
+    await stopMovienight(req.session.username);
+    resetStreamKey(req.session.username);
+    await startMovienight(req.session.username);
+    return res.redirect('/me');
+}); 
+
+app.post('/password', authorize, async (req, res) => { 
+    if (!isProvisioned(req.session.username)) { 
+        return res.status(400).json({ error: 'not provisioned' });
+    } 
+    await stopMovienight(req.session.username);
+    resetPassword(req.session.username);
+    await startMovienight(req.session.username);
+    return res.redirect('/me');
+}); 
+
 
 const port = process.env.PORT || 8000;
 fs.mkdirSync(configPath('.'), { recursive: true });

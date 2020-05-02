@@ -30,9 +30,15 @@ Given('the following channels are provisioned:') do |table|
   end
 end
 
-Given('that the {string} for channel {string} is set to {string}') do |_key, channel, _value|
+Given('that the {string} for channel {string} is set to {string}') do |key, channel, value|
   config = JSON.parse(IO.read(File.open(File.join(CONFIG_PATH, channel, 'settings.json'))))
-  p config
+  config[key] = value
+  IO.write(File.join(CONFIG_PATH, channel, 'settings.json'), config.to_json)
+end
+
+Then('the {string} for channel {string} should not be {string}') do |key, channel, value|
+  config = JSON.parse(IO.read(File.open(File.join(CONFIG_PATH, channel, 'settings.json')))) 
+  expect(config[key]).to_not eq(value)
 end
 
 When('a {string} request is made to {string}') do |method, path|

@@ -40,6 +40,12 @@ const deleteContainer = async (container) => {
     });  
 };
 
+const restartContainer = async (container) => {
+    return new Promise(resolve => { 
+        container.restart().then(resp => resolve(resp));
+    });
+};
+
 const startMovienight = async (username) => {
     const { movienightPort, rtmpPort } = readUserDockerConfig(username);
 
@@ -104,7 +110,12 @@ const stopMovienight = async (username) => {
     await deleteContainer(container);
 };
 
+const restartMovienight = async (username) => {
+    const container = await getContainerByName(`${username}-movienight`);
+    await restartContainer(container);
+};
+
 module.exports = { 
-    startMovienight, stopMovienight,
+    startMovienight, stopMovienight, restartMovienight,
     startNginx, reloadNginx
 };
