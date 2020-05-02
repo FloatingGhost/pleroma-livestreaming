@@ -34,7 +34,7 @@ Then install the systemD file from `install/` and you should be good to go.
 Consider installing an IRC bridge to allow users to view your stream
 without having to use the web interface
 
-Install [Epi's brdige](https://notabug.org/epi/movie-night-chat) and
+Install [Epi's bridge](https://notabug.org/epi/movie-night-chat) and
 use the systemd file I've provided here to allow IRC functionality.
 
 Incidentally, the raw FLV endpoint is `/channels/<channel>/live` - point
