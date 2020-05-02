@@ -1,0 +1,17 @@
+[Unit]
+Description=Pleroma-Livestreaming IRC bridge
+After=network.target
+
+[Service]
+User=hannah
+WorkingDirectory=/home/irc/movie-night-chat
+# POINT THE --url AT YOUR NGINX CONTAINER PORT!!
+ExecStart=/home/irc/movie-night-chat/main --port 6667 --url ws://127.0.0.1:9001
+ExecReload=/bin/kill $MAINPID
+Environment=PLTSTDOUT=info
+Environment=PLTSTDERR=info
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

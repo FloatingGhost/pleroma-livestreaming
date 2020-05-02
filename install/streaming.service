@@ -1,5 +1,5 @@
 [Unit]
-Description=Livestreaming
+Description=Pleroma-Livestreaming
 After=network.target
 
 [Service]
@@ -10,18 +10,11 @@ ExecReload=/bin/kill $MAINPID
 KillMode=process
 Restart=on-failure
 
-; Some security directives.
-; Use private /tmp and /var/tmp folders inside a new file system namespace, whi$
 PrivateTmp=true
-; Mount /usr, /boot, and /etc as read-only for processes invoked by this servic$
 ProtectSystem=full
-; Sets up a new /dev mount for the process and only adds API pseudo devices lik$
 PrivateDevices=false
-; Ensures that the service process and all its children can never gain new priv$
 NoNewPrivileges=true
-; Drops the sysadmin capability from the daemon.
 CapabilityBoundingSet=~CAP_SYS_ADMIN
 
 [Install]
 WantedBy=multi-user.target
-
