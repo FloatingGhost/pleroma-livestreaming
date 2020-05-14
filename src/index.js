@@ -1,7 +1,7 @@
+require('dotenv').config();
 const express = require('express');
-const { check, validationResult } = require('express-validator');
 const session = require('express-session');
-const { login, authorize } = require('./lib/pleroma-authenticator');
+const { oauthCallback, login, authorize } = require('./lib/pleroma-authenticator');
 const { newConfig, deleteConfig, resetPassword, resetStreamKey } = require('./lib/config-writer');
 const fs = require('fs');
 const { startMovienight, stopMovienight, startNginx, reloadNginx } = require('./lib/docker');
@@ -13,7 +13,6 @@ const path = require('path');
 const fetch = require('node-fetch');
 const sassMiddleware = require('node-sass-middleware');
 
-require('dotenv').config();
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -62,22 +61,14 @@ app.get('/list', async (req, res) => {
     res.render('channels', { channels: live });
 });
 
-app.post('/login', [
-    check('username').exists(),
-    check('password').exists()
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-    const { username, password } = req.body;
-    const resp = await login(username, password);
-    if (resp) {
-        req.session.username = username;
-        return res.redirect('/me');
-    } else {
-        return res.status(403).render('login-fail');
-    }
+app.post('/login', async (req, res) => {
+    return await login(req, res);
+});
+
+app.get('/callback', async (req, res) => {
+    const { code } = req.query;
+    req.session.token = `Bearer ${await oauthCallback(code)}`;
+    return res.redirect('/me');
 });
 
 app.post('/provision', authorize, async (req, res) => {

@@ -946,6 +946,14 @@ etag@~1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
+express-pleroma-authenticator@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/express-pleroma-authenticator/-/express-pleroma-authenticator-1.0.4.tgz#6c528ade3e4e225f9e49978823920505f70be58c"
+  integrity sha512-2S5+gFghds0l9Z8AXvaUVJtIfodDEDobliqXgaPKSFo3XIth0ubEOBlyr8miMKYHW0YyI2+u3l2Ctwuhi06JLQ==
+  dependencies:
+    node-fetch "^2.6.0"
+    url-join "^4.0.1"
+
 express-session@^1.17.1:
   version "1.17.1"
   resolved "https://registry.yarnpkg.com/express-session/-/express-session-1.17.1.tgz#36ecbc7034566d38c8509885c044d461c11bf357"
@@ -3136,6 +3144,11 @@ uri-js@^4.2.2:
   integrity sha512-KY9Frmirql91X2Qgjry0Wd4Y+YTdrdZheS8TFwvkbLWf/G5KNJDCh6pKL5OZctEW4+0Baa5idK2ZQuELRwPznQ==
   dependencies:
     punycode "^2.1.0"
+
+url-join@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/url-join/-/url-join-4.0.1.tgz#b642e21a2646808ffa178c4c5fda39844e12cde7"
+  integrity sha512-jk1+QP6ZJqyOiuEI9AEWQfju/nB2Pw466kbA0LEZljHwKeMgd9WrAEgEGxjPDD2+TNbbb37rTyhEfrCXfuKXnA==
 
 url-parse-lax@^3.0.0:
   version "3.0.0"
