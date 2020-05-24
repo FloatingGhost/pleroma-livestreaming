@@ -18,7 +18,7 @@ docker pull floatingghost/movienight
 Then install JS deps
 ```bash
 sudo npm i -g yarn
-git clone git@github.com:FloatingGhost/pleroma-livestreaming.git
+git clone https://git.ihatebeinga.live/IHBAGang/pleroma-livestreaming.git
 cd pleroma-livestreaming/src
 yarn
 ```
