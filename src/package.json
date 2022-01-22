@@ -13,7 +13,7 @@
     "express-validator": "^6.4.0",
     "find-free-port": "^2.0.0",
     "node-docker-api": "^1.1.22",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.1.1",
     "node-sass": "^4.14.0",
     "node-sass-middleware": "^0.11.0",
     "pug": "^2.0.4",
