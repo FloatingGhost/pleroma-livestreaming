@@ -3,3 +3,4 @@ config
 .env
 src/public
 test-config
+update.py

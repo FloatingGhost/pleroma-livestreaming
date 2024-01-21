@@ -50,7 +50,7 @@ const startMovienight = async (username) => {
     const { movienightPort, rtmpPort } = readUserDockerConfig(username);
 
     const container = await createContainer({
-        Image: 'floatingghost/movienight',
+	    Image: 'floatingghost/movienight:0.0.18',
         name: `${username}-movienight`,
         PortBindings: {
             '8089/tcp': [{'HostPort': movienightPort.toString() }],
